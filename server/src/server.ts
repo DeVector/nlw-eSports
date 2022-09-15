@@ -1,11 +1,24 @@
 import express from 'express';
+import { PrismaClient } from '@prisma/client';
 
 const app = express();
 
-/** Retorna todos os games */
-app.get('/games', (request, response) => {
+const prisma = new PrismaClient();
 
-    return response.json([]);
+/** Retorna todos os games */
+app.get('/games', async (request, response) => {
+
+    const games = await prisma.game.findMany({
+        include: {
+            _count: {
+                select: {
+                    ads: true
+                }
+            }
+        }
+    })
+
+    return response.json(games);
 
 });
 
