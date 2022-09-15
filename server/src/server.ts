@@ -5,7 +5,7 @@ const app = express();
 /** Retorna todos os games */
 app.get('/games', (request, response) => {
 
-    return response.json();
+    return response.json([]);
 
 });
 
