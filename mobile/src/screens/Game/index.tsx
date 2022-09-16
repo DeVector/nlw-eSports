@@ -1,21 +1,26 @@
+import { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Image, FlatList, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Entypo } from '@expo/vector-icons';
 
-import { Background } from '../../components/Background';
 import logoImg from '../../assets/logo-nlw-esports.png';
 
-import { styles } from './styles';
-import { GameParams } from '../../@types/navigation';
+
 import { THEME } from '../../theme';
+import { styles } from './styles';
+
+import { GameParams } from '../../@types/navigation';
+
+import { Background } from '../../components/Background';
 import { Heading } from '../../components/Heading';
 import { DuoCard, DuoCardProps } from '../../components/DuoCard';
-import { useEffect, useState } from 'react';
+import { DuoMatch } from '../../components/DuoMatch';
 
 export function Game() {
 
   const [duos, setDuos] = useState<DuoCardProps[]>([]);
+  const [discordDuoSelected, setDiscordDuoSelected] = useState('');
 
   const navigation = useNavigation();
 
@@ -26,10 +31,18 @@ export function Game() {
     navigation.goBack();
   };
 
+  async function getDiscordUser(adsId: string) {
+    useEffect(() => {
+      fetch(`http://192.168.100.5:3333/ads/${adsId}/discord`)
+        .then((response) => response.json())
+        .then((data) => {console.log(data)})
+    }, []);
+  }
+
   useEffect(() => {
     fetch(`http://192.168.100.5:3333/games/${game.id}/ads`)
-      .then(response => response.json())
-      .then(data => setDuos(data))
+      .then((response) => response.json())
+      .then((data) => setDuos(data))
   }, []);
 
   return (
@@ -65,11 +78,12 @@ export function Game() {
 
         <FlatList 
           data={duos}
-          keyExtractor={item => item.id}
+
+          keyExtractor={(item) => item.id}
           renderItem= {({ item }) => (
             <DuoCard 
               data={item}
-              onConnect={() => { }}
+              onConnect={() => {}}
             />
           )}
           horizontal
@@ -83,7 +97,11 @@ export function Game() {
           )}
         />
         
-
+            <DuoMatch 
+              visible={discordDuoSelected.length > 0}
+              discord={discordDuoSelected}
+              onClose={ () => setDiscordDuoSelected('')}
+            />
       </SafeAreaView>
     </Background>
   );
